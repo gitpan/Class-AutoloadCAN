@@ -7,7 +7,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..18\n"; }
+BEGIN { $| = 1; print "1..20\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Class::AutoloadCAN;
 use Carp;
@@ -77,6 +77,8 @@ true(Child->base1_method eq "Base1", "Child gets inherited CAN methods");
 true(!Child->can("base2_method"), "CAN from ignored class, ignored");
 eval "Child->base2_method";
 true(($@ and $@ =~ /object method/), "Ignored class doesn't provide methods");
+true(($@ and $@ =~ /"Child"/), "The error message includes the package");
+true(($@ and $@ !~ /forgot to load/), "No load message on loaded package");
 true(($@ =~ /eval/) ? 1 : 0, "The error comes from the right caller");
 Class::AutoloadCAN->import("Base2");
 true(Child->can("base2_method"), "Can unignore class");
@@ -92,6 +94,7 @@ sub true {
   $tests_done++;
   if ($value) {
     print "ok $tests_done\n";
+    #print STDERR "\n\n$tests_done: $test succeeded\n";
   }
   else {
     print "not ok $tests_done\n";
