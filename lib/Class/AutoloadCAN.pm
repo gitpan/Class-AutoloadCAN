@@ -1,6 +1,5 @@
 package Class::AutoloadCAN;
-use Carp;
-$VERSION = 0.01;
+$VERSION = 0.02;
 no warnings 'redefine';
 
 my %base_install;
@@ -16,16 +15,17 @@ sub import {
       my $autoload = shift;
       my $method = _can($autoload, @_);
       if ($method) {
-        goto &$method;
+        return &$method;
       }
-      elsif ($autoload =~ /(.*)::([^:]+)/) {
+      my ($package, $file, $line) = caller(1);
+      my $where = qq(package "$class" at $file line $line.);
+      if ($autoload =~ /(.*)::([^:]+)/) {
         my $class = $1;
         my $method = $2;
-	my ($package, $file, $line) = caller;
-        croak(qq(Can't locate object method "$method" via package "$class" at $file line $line.));
+	die qq(Can't locate object method "$method" via $where\n);
       }
       else {
-        croak("AUTOLOAD finds no \$AUTOLOAD, very bad.");
+        die qq(AUTOLOAD saw no \$AUTOLOAD after $where\n);
       }
     };
     eval qq{
@@ -40,6 +40,10 @@ sub import {
 }
 
 my $original_can = \&UNIVERSAL::can;
+# The arguments have been rearranged here.  That is for the promise I made
+# that you can do anything with this strategy that you can with AUTOLOAD.
+# I even support the case where you've AUTOLOADed calling an autoloaded
+# function directly without arguments.
 sub _can {
   my ($method, @args) = @_;
   $self = $args[0];

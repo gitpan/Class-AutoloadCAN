@@ -1,4 +1,8 @@
 Revision history for Perl extension UNIVERSAL::AUTOLOAD_CAN.
 
-0.01  Fri Apr  8 22:00:00 PDT 2005
-        - Wrote module.
+0.01  Sat Apr  9  4:30 PDT 2005
+        - Wrote module and released on CPAN.
+
+0.02  Sat Apr  9 17:40 PDT 2005
+        - Fixed a bug where errors were reported on the wrong line.
+	- Added comment in code explaining a surprising argument order.
